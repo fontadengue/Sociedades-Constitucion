@@ -258,35 +258,56 @@
             margin-bottom: 1rem;
         }
 
+        .form-wrapper {
+            display: block;
+        }
+
         .referencias-section {
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 0.5px solid #e5e7eb;
+            position: fixed;
+            right: 20px;
+            top: 100px;
+            width: 300px;
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 0.5px solid #e5e7eb;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .referencias-section h3 {
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 14px;
+            font-weight: 600;
             color: #1a365d;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .referencia-item {
-            margin-bottom: 1.5rem;
-            padding-left: 1rem;
-            border-left: 2px solid #d1d5db;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 0.5px solid #d1d5db;
+        }
+
+        .referencia-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
         }
 
         .referencia-numero {
-            font-weight: 500;
-            color: #1a365d;
-            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #185fa5;
+            font-size: 12px;
+            margin-bottom: 0.25rem;
         }
 
         .referencia-texto {
-            font-size: 13px;
+            font-size: 12px;
             color: #4b5563;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .helper-text-dnf {
@@ -294,6 +315,33 @@
             color: #999;
             margin-top: 0.5rem;
             font-style: italic;
+        }
+
+        @media (max-width: 1400px) {
+            .referencias-section {
+                right: 10px;
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .referencias-section {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
@@ -318,6 +366,8 @@
             </div>
 
             <form id="formulario">
+                <div class="form-wrapper">
+                    <div>
                 <!-- SECCIÓN 1: DATOS GENERALES -->
                 <div class="section">
                     <h2>1. Datos del contrato</h2>
@@ -386,36 +436,37 @@
                         ✓ Los campos completados se incluirán en el PDF descargable
                     </p>
                 </div>
-
-                <!-- REFERENCIAS -->
-                <div class="referencias-section">
-                    <h3>Referencias</h3>
-                    
-                    <div class="referencia-item">
-                        <div class="referencia-numero">(1)</div>
-                        <div class="referencia-texto">Le solicitamos nos indique tres opciones de denominación, ordenadas según su preferencia</div>
-                    </div>
-
-                    <div class="referencia-item">
-                        <div class="referencia-numero">(2)</div>
-                        <div class="referencia-texto">Si ya lo saben o la ciudad en el que va a estar por el momento</div>
-                    </div>
-
-                    <div class="referencia-item">
-                        <div class="referencia-numero">(3)</div>
-                        <div class="referencia-texto">
-                            <strong>Tipo Societario y Capital mínimo exigido:</strong> S.R.L.: 10 salarios mínimos vitales y móviles / S.A. $ 30.000.000 / S.A.S.: 2 salarios mínimos vitales y móviles.
-                            <br><br>
-                            En cualquiera de los casos, la parte del capital que se realice en efectivo, se debe hacer un depósito en garantía del 25% sobre dicho monto, el cual se deposita en Banco Santa Fe, y se retira luego de finalizar la inscripción, en nuestro caso lo hacemos en el momento que ya está todo listo y solo falte hacer el depósito del aporte, para que el dinero permanezca inmovilizado el menor tiempo posible, suele quedar parado entre 3 y 2 semanas (puede estar sujeto a demoras por el cambio del organismo de inscripción).
-                        </div>
-                    </div>
-
-                    <div class="referencia-item">
-                        <div class="referencia-numero">(4)</div>
-                        <div class="referencia-texto">Quién o quiénes ocuparían el cargo: si es uno de los socios, solo indicar el nombre o si va a ser alguien que no sea socio, enviar todos los mismos datos personales solicitados a los socios.</div>
-                    </div>
                 </div>
             </form>
+
+            <!-- REFERENCIAS -->
+            <div class="referencias-section">
+                <h3>Referencias</h3>
+                
+                <div class="referencia-item">
+                    <div class="referencia-numero">(1)</div>
+                    <div class="referencia-texto">Le solicitamos nos indique tres opciones de denominación, ordenadas según su preferencia</div>
+                </div>
+
+                <div class="referencia-item">
+                    <div class="referencia-numero">(2)</div>
+                    <div class="referencia-texto">Si ya lo saben o la ciudad en el que va a estar por el momento</div>
+                </div>
+
+                <div class="referencia-item">
+                    <div class="referencia-numero">(3)</div>
+                    <div class="referencia-texto">
+                        <strong>Tipo Societario y Capital mínimo exigido:</strong> S.R.L.: 10 salarios mínimos vitales y móviles / S.A. $ 30.000.000 / S.A.S.: 2 salarios mínimos vitales y móviles.
+                        <br><br>
+                        En cualquiera de los casos, la parte del capital que se realice en efectivo, se debe hacer un depósito en garantía del 25% sobre dicho monto, el cual se deposita en Banco Santa Fe, y se retira luego de finalizar la inscripción, en nuestro caso lo hacemos en el momento que ya está todo listo y solo falte hacer el depósito del aporte, para que el dinero permanezca inmovilizado el menor tiempo posible, suele quedar parado entre 3 y 2 semanas (puede estar sujeto a demoras por el cambio del organismo de inscripción).
+                    </div>
+                </div>
+
+                <div class="referencia-item">
+                    <div class="referencia-numero">(4)</div>
+                    <div class="referencia-texto">Quién o quiénes ocuparían el cargo: si es uno de los socios, solo indicar el nombre o si va a ser alguien que no sea socio, enviar todos los mismos datos personales solicitados a los socios.</div>
+                </div>
+            </div>
         </div>
 
         <div id="successSection" class="hidden">
