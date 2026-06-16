@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constitución de Sociedad - Formulario</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #f9fafb 100%);
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .logo {
+            margin-bottom: 1.5rem;
+        }
+
+        .logo img {
+            max-height: 80px;
+            width: auto;
+        }
+
+        .contact-info {
+            margin-bottom: 1.5rem;
+            padding: 0.75rem 0;
+            border-top: 0.5px solid #e5e7eb;
+            border-bottom: 0.5px solid #e5e7eb;
+        }
+
+        .contact-info p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .header-content {
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 500;
+            color: #1a365d;
+            margin: 1rem 0 0 0;
+            text-transform: capitalize;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+            padding-left: 1.5rem;
+            border-left: 3px solid #1a365d;
+        }
+
+        .section:nth-child(2) {
+            border-left-color: #185fa5;
+        }
+
+        .section h2 {
+            font-size: 16px;
+            font-weight: 500;
+            color: inherit;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 0.5px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #1a365d;
+            box-shadow: 0 0 0 2px rgba(26, 54, 93, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .socio-card {
+            background: #f9fafb;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 0.5px solid #e5e7eb;
+        }
+
+        .socio-card h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #185fa5;
+            margin-bottom: 1rem;
+        }
+
+        .button-group {
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 0.5px solid #e5e7eb;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            background: #1a365d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #0f1f3d;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .success-message {
+            background: #f0fdf4;
+            border: 0.5px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .success-message .icon {
+            font-size: 32px;
+            margin-bottom: 1rem;
+        }
+
+        .success-message h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: #15803d;
+            margin-bottom: 0.5rem;
+            border: none;
+            padding: 0;
+        }
+
+        .success-message p {
+            font-size: 14px;
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+
+        .success-message button {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 0.5rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .add-socio-btn {
+            background: #185fa5;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .add-socio-btn:hover {
+            background: #0f3f7f;
+        }
+
+        .remove-socio-btn {
+            background: #c7372f;
+            width: auto;
+            padding: 0.5rem 1rem;
+            font-size: 13px;
+            margin-top: 1rem;
+        }
+
+        .remove-socio-btn:hover {
+            background: #a01d1a;
+        }
+
+        .socio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .referencias-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 0.5px solid #e5e7eb;
+        }
+
+        .referencias-section h3 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a365d;
+            margin-bottom: 1.5rem;
+        }
+
+        .referencia-item {
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 2px solid #d1d5db;
+        }
+
+        .referencia-numero {
+            font-weight: 500;
+            color: #1a365d;
+            margin-bottom: 0.5rem;
+        }
+
+        .referencia-texto {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .helper-text-dnf {
+            font-size: 12px;
+            color: #999;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="formSection">
+            <div class="header">
+                <div class="logo">
+                    <img src="https://www.estudiodutto.com.ar/img/logoestudio.png" alt="Logo Estudio Dutto">
+                </div>
+                <div class="contact-info">
+                    <p style="font-size: 12px; color: #666; line-height: 1.6; margin: 0.5rem 0;">
+                        Salta 3476 – Telefax (0342) 456-2730 – S3000CMV Santa Fe – Rep. Argentina<br>
+                        <a href="mailto:contacto@estudiodutto.com.ar" style="color: #1a365d; text-decoration: none;">contacto@estudiodutto.com.ar</a>
+                    </p>
+                </div>
+                <div class="header-content">
+                    <h1>Estudio contable dutto</h1>
+                    <h2 style="font-size: 16px; font-weight: 400; color: #4b5563; margin: 0.5rem 0 0 0;">Constitución de Sociedad</h2>
+                    <p>Completa todos los campos requeridos para generar tu documento PDF</p>
+                </div>
+            </div>
+
+            <form id="formulario">
+                <!-- SECCIÓN 1: DATOS GENERALES -->
+                <div class="section">
+                    <h2>1. Datos del contrato</h2>
+
+                    <div class="form-group">
+                        <label for="denominacion1">Denominación social (Opción 1 - Preferida) <span style="color: #999; font-weight: normal;">(1)</span></label>
+                        <input type="text" id="denominacion1" name="denominacion1" placeholder="Nombre de la sociedad">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="denominacion2">Denominación social (Opción 2)</label>
+                        <input type="text" id="denominacion2" name="denominacion2" placeholder="Alternativa 1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="denominacion3">Denominación social (Opción 3)</label>
+                        <input type="text" id="denominacion3" name="denominacion3" placeholder="Alternativa 2">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="domicilio">Domicilio <span style="color: #999; font-weight: normal;">(2)</span></label>
+                        <input type="text" id="domicilio" name="domicilio" placeholder="Calle, número, ciudad">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="capital">Capital <span style="color: #999; font-weight: normal;">(3)</span></label>
+                        <input type="text" id="capital" name="capital" placeholder="Monto del capital social">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tipoSocietario">Tipo societario <span style="color: #999; font-weight: normal;">(3)</span></label>
+                            <select id="tipoSocietario" name="tipoSocietario">
+                                <option>S.R.L.</option>
+                                <option>S.A.</option>
+                                <option>S.A.S.</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gerente">Gerente <span style="color: #999; font-weight: normal;">(4)</span></label>
+                        <input type="text" id="gerente" name="gerente" placeholder="Nombre del gerente (puede ser socio)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="objetoSocial">Objeto social</label>
+                        <textarea id="objetoSocial" name="objetoSocial" placeholder="Descripción de la actividad a desarrollar"></textarea>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: DATOS SOCIOS -->
+                <div class="section">
+                    <h2>2. Datos de los socios</h2>
+
+                    <button type="button" class="add-socio-btn" onclick="agregarSocio()">
+                        <span>+ Agregar socio</span>
+                    </button>
+
+                    <div id="sociosContainer"></div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" onclick="generarPDF()">Descargar PDF</button>
+                    <p class="helper-text" style="text-align: center; margin-top: 1rem;">
+                        ✓ Los campos completados se incluirán en el PDF descargable
+                    </p>
+                </div>
+
+                <!-- REFERENCIAS -->
+                <div class="referencias-section">
+                    <h3>Referencias</h3>
+                    
+                    <div class="referencia-item">
+                        <div class="referencia-numero">(1)</div>
+                        <div class="referencia-texto">Le solicitamos nos indique tres opciones de denominación, ordenadas según su preferencia</div>
+                    </div>
+
+                    <div class="referencia-item">
+                        <div class="referencia-numero">(2)</div>
+                        <div class="referencia-texto">Si ya lo saben o la ciudad en el que va a estar por el momento</div>
+                    </div>
+
+                    <div class="referencia-item">
+                        <div class="referencia-numero">(3)</div>
+                        <div class="referencia-texto">
+                            <strong>Tipo Societario y Capital mínimo exigido:</strong> S.R.L.: 10 salarios mínimos vitales y móviles / S.A. $ 30.000.000 / S.A.S.: 2 salarios mínimos vitales y móviles.
+                            <br><br>
+                            En cualquiera de los casos, la parte del capital que se realice en efectivo, se debe hacer un depósito en garantía del 25% sobre dicho monto, el cual se deposita en Banco Santa Fe, y se retira luego de finalizar la inscripción, en nuestro caso lo hacemos en el momento que ya está todo listo y solo falte hacer el depósito del aporte, para que el dinero permanezca inmovilizado el menor tiempo posible, suele quedar parado entre 3 y 2 semanas (puede estar sujeto a demoras por el cambio del organismo de inscripción).
+                        </div>
+                    </div>
+
+                    <div class="referencia-item">
+                        <div class="referencia-numero">(4)</div>
+                        <div class="referencia-texto">Quién o quiénes ocuparían el cargo: si es uno de los socios, solo indicar el nombre o si va a ser alguien que no sea socio, enviar todos los mismos datos personales solicitados a los socios.</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="successSection" class="hidden">
+            <div class="success-message">
+                <div class="icon">✓</div>
+                <h2>PDF generado correctamente</h2>
+                <p>Tu documento ha sido descargado. Puedes completar otro presionando el botón de abajo.</p>
+                <button type="button" onclick="resetForm()">Nuevo formulario</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let socioCount = 1;
+
+        function crearSocioHTML(numero) {
+            return `
+                <div class="socio-card" id="socio${numero}-card">
+                    <div class="socio-header">
+                        <h3>Socio ${numero}</h3>
+                        ${numero > 1 ? `<button type="button" class="remove-socio-btn" onclick="eliminarSocio(${numero})">Eliminar socio</button>` : ''}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="socio${numero}_nombre">Nombre y apellido completo</label>
+                        <input type="text" id="socio${numero}_nombre" name="socio${numero}_nombre" placeholder="Nombre completo">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="socio${numero}_participacion">Participación %</label>
+                            <input type="text" id="socio${numero}_participacion" name="socio${numero}_participacion" placeholder="%">
+                        </div>
+                        <div class="form-group">
+                            <label for="socio${numero}_dni">DNI</label>
+                            <input type="text" id="socio${numero}_dni" name="socio${numero}_dni" placeholder="DNI">
+                        </div>
+                    </div>
+                    <p class="helper-text-dnf">(Enviar copia de los DNI anverso y reverso)</p>
+
+                    <div class="form-group">
+                        <label for="socio${numero}_cuit">CUIT</label>
+                        <input type="text" id="socio${numero}_cuit" name="socio${numero}_cuit" placeholder="CUIT Nº">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="socio${numero}_nacimiento">Fecha de nacimiento</label>
+                        <input type="date" id="socio${numero}_nacimiento" name="socio${numero}_nacimiento">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="socio${numero}_domicilio">Domicilio</label>
+                        <input type="text" id="socio${numero}_domicilio" name="socio${numero}_domicilio" placeholder="Domicilio completo">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="socio${numero}_estado">Estado civil</label>
+                            <select id="socio${numero}_estado" name="socio${numero}_estado">
+                                <option value="">Seleccionar</option>
+                                <option>Soltero/a</option>
+                                <option>Casado/a</option>
+                                <option>Divorciado/a</option>
+                                <option>Viudo/a</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="socio${numero}_profesion">Profesión/Ocupación</label>
+                            <input type="text" id="socio${numero}_profesion" name="socio${numero}_profesion" placeholder="Profesión">
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function agregarSocio() {
+            socioCount++;
+            const container = document.getElementById('sociosContainer');
+            container.insertAdjacentHTML('beforeend', crearSocioHTML(socioCount));
+        }
+
+        function eliminarSocio(numero) {
+            const card = document.getElementById(`socio${numero}-card`);
+            if (card) {
+                card.remove();
+            }
+        }
+
+        function inicializarSocios() {
+            const container = document.getElementById('sociosContainer');
+            for (let i = 1; i <= 3; i++) {
+                container.insertAdjacentHTML('beforeend', crearSocioHTML(i));
+                socioCount = i;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', inicializarSocios);
+
+        function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            
+            let yPos = 15;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 15;
+            const maxWidth = pageWidth - (margin * 2) - 60;
+            const lineHeight = 7;
+            const sectionSpacing = 8;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('DATOS CONSTITUCIÓN SOCIEDAD', margin, yPos);
+            
+            yPos += sectionSpacing + 5;
+            
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text('Datos contrato en general', margin, yPos);
+            yPos += lineHeight + 2;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            
+            const fields = [
+                ['Denominación - Opción 1:', document.getElementById('denominacion1').value],
+                ['Denominación - Opción 2:', document.getElementById('denominacion2').value],
+                ['Denominación - Opción 3:', document.getElementById('denominacion3').value],
+                ['Domicilio:', document.getElementById('domicilio').value],
+                ['Capital:', document.getElementById('capital').value],
+                ['Tipo Societario:', document.getElementById('tipoSocietario').value],
+                ['Gerente:', document.getElementById('gerente').value],
+            ];
+
+            fields.forEach(([label, value]) => {
+                doc.text(label, margin, yPos);
+                doc.text(value || '_______________', margin + 60, yPos);
+                yPos += lineHeight;
+            });
+
+            // Objeto social con texto envolvente
+            const objetoSocial = document.getElementById('objetoSocial').value || '_______________';
+            doc.text('Objeto social:', margin, yPos);
+            yPos += lineHeight;
+            
+            doc.setFont('helvetica', 'normal');
+            const splitText = doc.splitTextToSize(objetoSocial, maxWidth);
+            doc.text(splitText, margin + 5, yPos);
+            yPos += (splitText.length * lineHeight) + 2;
+
+            yPos += sectionSpacing;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text('Datos Socios', margin, yPos);
+            yPos += lineHeight + 2;
+
+            for (let i = 1; i <= socioCount; i++) {
+                const nombreField = document.getElementById(`socio${i}_nombre`);
+                if (nombreField && nombreField.value) {
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(10);
+                    doc.text(`Socio ${i}`, margin, yPos);
+                    yPos += lineHeight;
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    
+                    const socioFields = [
+                        ['Nombre completo:', document.getElementById(`socio${i}_nombre`).value],
+                        ['Participación %:', document.getElementById(`socio${i}_participacion`).value],
+                        ['DNI:', document.getElementById(`socio${i}_dni`).value],
+                        ['CUIT:', document.getElementById(`socio${i}_cuit`).value],
+                        ['Fecha nacimiento:', document.getElementById(`socio${i}_nacimiento`).value],
+                        ['Domicilio:', document.getElementById(`socio${i}_domicilio`).value],
+                        ['Estado civil:', document.getElementById(`socio${i}_estado`).value],
+                        ['Profesión:', document.getElementById(`socio${i}_profesion`).value],
+                    ];
+
+                    socioFields.forEach(([label, value]) => {
+                        doc.text(label, margin, yPos);
+                        doc.text(value || '_______________', margin + 50, yPos);
+                        yPos += lineHeight;
+                    });
+
+                    yPos += 4;
+                }
+            }
+
+            const fileName = `Constitucion_Sociedad_${new Date().toLocaleDateString('es-AR').replace(/\//g, '-')}.pdf`;
+            doc.save(fileName);
+            
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('successSection').classList.remove('hidden');
+        }
+
+        function resetForm() {
+            document.getElementById('formulario').reset();
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('successSection').classList.add('hidden');
+            
+            const container = document.getElementById('sociosContainer');
+            container.innerHTML = '';
+            socioCount = 1;
+            inicializarSocios();
+            
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
