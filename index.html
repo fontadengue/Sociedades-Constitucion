@@ -633,6 +633,7 @@
             
             let yPos = 15;
             const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
             const margin = 15;
             const maxWidth = pageWidth - (margin * 2) - 60;
             const lineHeight = 7;
@@ -708,6 +709,10 @@
                     ];
 
                     socioFields.forEach(([label, value]) => {
+                        if (yPos > pageHeight - 20) {
+                            doc.addPage();
+                            yPos = 15;
+                        }
                         doc.text(label, margin, yPos);
                         doc.text(value || '_______________', margin + 50, yPos);
                         yPos += lineHeight;
@@ -738,11 +743,144 @@
                 ];
 
                 gerenteFields.forEach(([label, value]) => {
+                    if (yPos > pageHeight - 20) {
+                        doc.addPage();
+                        yPos = 15;
+                    }
                     doc.text(label, margin, yPos);
                     doc.text(value || '_______________', margin + 50, yPos);
                     yPos += lineHeight;
                 });
             }
+
+            // ===== NUEVA PÁGINA: REFERENCIAS =====
+            // Siempre agregamos página nueva para las referencias, con espaciado
+            yPos += sectionSpacing + 5;
+            if (yPos > pageHeight - 30) {
+                doc.addPage();
+                yPos = 15;
+            } else {
+                doc.addPage();
+                yPos = 15;
+            }
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('REFERENCIAS Y NORMATIVA APLICABLE', margin, yPos);
+            
+            yPos += sectionSpacing + 5;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text('Marco Legal', margin, yPos);
+            yPos += lineHeight + 2;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+
+            const referencias = [
+                { titulo: 'Ley General de Sociedades', detalle: 'Ley Nº 19.550 - Regula la constitución y funcionamiento de sociedades comerciales.' },
+                { titulo: 'Código Civil y Comercial de la Nación', detalle: 'Ley Nº 26.994 - Marco legal general para derechos y obligaciones de personas jurídicas.' },
+                { titulo: 'Ley de Simplificación Registral', detalle: 'Ley Nº 27.440 - Simplifica trámites para constitución de sociedades.' },
+                { titulo: 'Código Tributario', detalle: 'Ley Nº 11.683 - Regula obligaciones fiscales y tributarias de sociedades.' },
+                { titulo: 'Régimen de Inspección y Control de Sociedades', detalle: 'Ley Nº 22.315 - Define facultades y responsabilidades de órganos de control.' },
+            ];
+
+            referencias.forEach((ref, index) => {
+                if (yPos > pageHeight - 25) {
+                    doc.addPage();
+                    yPos = 15;
+                }
+                
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.text(`${index + 1}. ${ref.titulo}`, margin, yPos);
+                yPos += lineHeight;
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                const detalleLines = doc.splitTextToSize(ref.detalle, maxWidth);
+                doc.text(detalleLines, margin + 5, yPos);
+                yPos += (detalleLines.length * lineHeight) + 2;
+            });
+
+            yPos += sectionSpacing + 3;
+
+            if (yPos > pageHeight - 25) {
+                doc.addPage();
+                yPos = 15;
+            }
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text('Documentación Requerida para Presentación', margin, yPos);
+            yPos += lineHeight + 2;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+
+            const documentos = [
+                'Copia autenticada de DNI (anverso y reverso) de todos los socios y gerentes',
+                'Comprobante de domicilio (no mayor a 3 meses)',
+                'Acta constitutiva firmada por todos los socios',
+                'Comprobante de depósito del capital social en banco nacional',
+                'Certificado de CUIT de cada socio',
+                'Certificado de Dominio del inmueble (si aplica)',
+                'Declaración jurada de solvencia (si es requerida)',
+            ];
+
+            documentos.forEach((doc_item) => {
+                if (yPos > pageHeight - 20) {
+                    doc.addPage();
+                    yPos = 15;
+                }
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                const docLines = doc.splitTextToSize(`• ${doc_item}`, maxWidth);
+                doc.text(docLines, margin + 3, yPos);
+                yPos += (docLines.length * lineHeight) + 1;
+            });
+
+            yPos += sectionSpacing + 3;
+
+            if (yPos > pageHeight - 25) {
+                doc.addPage();
+                yPos = 15;
+            }
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text('Información Importante', margin, yPos);
+            yPos += lineHeight + 2;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+
+            const infoImportante = [
+                'La inscripción en el Registro Público de Comercio debe realizarse dentro de 30 días de la constitución.',
+                'El acta constitutiva debe ser autenticada por escribano público o apoderado registral.',
+                'El domicilio social debe ser accesible y funcional para notificaciones.',
+                'Todos los campos deben completarse con información verídica y actualizada.',
+                'Se debe mantener un ejemplar original del contrato social en la sede social.',
+                'Es obligatorio contar con un contador público responsable inscripto.',
+            ];
+
+            infoImportante.forEach((info) => {
+                if (yPos > pageHeight - 20) {
+                    doc.addPage();
+                    yPos = 15;
+                }
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                const infoLines = doc.splitTextToSize(`• ${info}`, maxWidth);
+                doc.text(infoLines, margin + 3, yPos);
+                yPos += (infoLines.length * lineHeight) + 1;
+            });
+
+            // Fecha de generación
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(8);
+            doc.text(`Documento generado el ${new Date().toLocaleDateString('es-AR')}`, margin, pageHeight - 10);
 
             const fileName = `Constitucion_Sociedad_${new Date().toLocaleDateString('es-AR').replace(/\//g, '-')}.pdf`;
             doc.save(fileName);
