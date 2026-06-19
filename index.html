@@ -602,8 +602,8 @@
                 <div id="feedback-pdf-container" class="feedback-container">
                     <p>¿Te resultó práctico completar este formulario?</p>
                     <div class="feedback-buttons" id="feedback-buttons">
-                        <button type="button" class="feedback-btn si" onclick="enviarFeedback('Sí, práctico')">👍 Sí, práctico</button>
-                        <button type="button" class="feedback-btn no" onclick="enviarFeedback('No tan práctico')">👎 No tan práctico</button>
+                        <button type="button" class="feedback-btn si" onclick="enviarFeedback('SI')">👍 Sí, práctico</button>
+                        <button type="button" class="feedback-btn no" onclick="enviarFeedback('NO')">👎 No tan práctico</button>
                     </div>
                     <div id="feedback-gracias" class="feedback-gracias" style="display:none;">¡Gracias por tu opinión!</div>
                 </div>
@@ -990,20 +990,20 @@
           }
         }
 
-        /* ── Feedback → Google Sheet ── */
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzyxkdwVnYs7iRJBWApB2y8Z1bLcSV-L_YRtc0c10Z5XO98-eag_AbzVnMLljWXwk2-cA/exec';
+        /* ── Feedback → Google Forms ── */
+        // URL de envío del formulario (termina en /formResponse, NO en /viewform)
+        const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSdL2DWoC2OuKn61MiLNzf6fDtnQHpqn0e520ktzWSInTSKc0g/formResponse';
+        // ID del campo de la pregunta "Te Pareció Práctico?" (valores exactos: SI / NO)
+        const ENTRY_RESPUESTA = 'entry.169789478';
 
         function enviarFeedback(respuesta) {
             // Deshabilitar botones de inmediato
             document.querySelectorAll('.feedback-btn').forEach(btn => btn.disabled = true);
 
-            const tipoSocietario = document.getElementById('tipoSocietario').value;
-
             const params = new URLSearchParams();
-            params.append('respuesta', respuesta);
-            params.append('tipoSocietario', tipoSocietario);
+            params.append(ENTRY_RESPUESTA, respuesta); // debe ser exactamente 'SI' o 'NO'
 
-            fetch(APPS_SCRIPT_URL, {
+            fetch(FORM_ACTION, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
