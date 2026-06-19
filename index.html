@@ -343,6 +343,78 @@
                 font-size: 24px;
             }
         }
+
+        /* ── Feedback post-PDF ── */
+        .feedback-container {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: #f0f7ff;
+            border-radius: 8px;
+            border: 1px solid #bfdbfe;
+            text-align: center;
+        }
+
+        .feedback-container p {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a365d;
+            margin-bottom: 1rem;
+        }
+
+        .feedback-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .feedback-btn {
+            width: auto;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1.5px solid transparent;
+        }
+
+        .feedback-btn.si {
+            background: #dcfce7;
+            color: #15803d;
+            border-color: #86efac;
+        }
+
+        .feedback-btn.si:hover {
+            background: #bbf7d0;
+        }
+
+        .feedback-btn.no {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #fcd34d;
+        }
+
+        .feedback-btn.no:hover {
+            background: #fde68a;
+        }
+
+        .feedback-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .feedback-gracias {
+            font-size: 14px;
+            color: #15803d;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -525,7 +597,18 @@
                 <div class="icon">✓</div>
                 <h2>PDF generado correctamente</h2>
                 <p>Tu documento ha sido descargado. Puedes completar otro presionando el botón de abajo.</p>
-                <button type="button" onclick="resetForm()">Nuevo formulario</button>
+
+                <!-- Feedback -->
+                <div id="feedback-pdf-container" class="feedback-container">
+                    <p>¿Te resultó práctico completar este formulario?</p>
+                    <div class="feedback-buttons" id="feedback-buttons">
+                        <button type="button" class="feedback-btn si" onclick="enviarFeedback('Sí, práctico')">👍 Sí, práctico</button>
+                        <button type="button" class="feedback-btn no" onclick="enviarFeedback('No tan práctico')">👎 No tan práctico</button>
+                    </div>
+                    <div id="feedback-gracias" class="feedback-gracias" style="display:none;">¡Gracias por tu opinión!</div>
+                </div>
+
+                <button type="button" onclick="resetForm()" style="margin-top:1.25rem;">Nuevo formulario</button>
             </div>
         </div>
     </div>
@@ -628,6 +711,7 @@
         document.addEventListener('DOMContentLoaded', inicializarSocios);
 
         function generarPDF() {
+          try {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
             
@@ -884,9 +968,57 @@
 
             const fileName = `Constitucion_Sociedad_${new Date().toLocaleDateString('es-AR').replace(/\//g, '-')}.pdf`;
             doc.save(fileName);
-            
-            document.getElementById('formSection').classList.add('hidden');
-            document.getElementById('successSection').classList.remove('hidden');
+
+            // Mostrar pantalla de éxito (nunca ocultar el form si la pantalla de éxito no existe)
+            const successSection = document.getElementById('successSection');
+            const formSection = document.getElementById('formSection');
+            if (successSection && formSection) {
+                // Si successSection quedó anidado DENTRO de formSection, lo sacamos afuera
+                // (como hermano) para que al ocultar el form no se oculte también.
+                if (successSection.parentElement !== formSection.parentElement) {
+                    formSection.parentElement.appendChild(successSection);
+                }
+                successSection.classList.remove('hidden');
+                formSection.classList.add('hidden');
+                window.scrollTo(0, 0);
+            } else {
+                alert('El PDF se generó, pero este archivo NO tiene la pantalla de éxito con el feedback (successSection). Estás corriendo una versión vieja del index.html: reemplazalo por el que te pasé.');
+            }
+          } catch (err) {
+            console.error('Error generando el PDF:', err);
+            alert('Hubo un problema al generar el PDF. Abrí la consola del navegador (F12) y pasame el error que aparece en rojo.');
+          }
+        }
+
+        /* ── Feedback → Google Sheet ── */
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzyxkdwVnYs7iRJBWApB2y8Z1bLcSV-L_YRtc0c10Z5XO98-eag_AbzVnMLljWXwk2-cA/exec';
+
+        function enviarFeedback(respuesta) {
+            // Deshabilitar botones de inmediato
+            document.querySelectorAll('.feedback-btn').forEach(btn => btn.disabled = true);
+
+            const tipoSocietario = document.getElementById('tipoSocietario').value;
+
+            const params = new URLSearchParams();
+            params.append('respuesta', respuesta);
+            params.append('tipoSocietario', tipoSocietario);
+
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            })
+            .then(() => {
+                document.getElementById('feedback-buttons').style.display = 'none';
+                document.getElementById('feedback-gracias').style.display = 'block';
+            })
+            .catch(err => {
+                console.error('Error enviando feedback:', err);
+                // Igual mostramos gracias para no bloquear al usuario
+                document.getElementById('feedback-buttons').style.display = 'none';
+                document.getElementById('feedback-gracias').style.display = 'block';
+            });
         }
 
         function resetForm() {
@@ -897,6 +1029,11 @@
             // Resetear opción de gerente
             document.querySelector('input[name="gerenteSocio"][value="si"]').checked = true;
             document.getElementById('gerenteInfoSection').style.display = 'none';
+
+            // Resetear feedback
+            document.getElementById('feedback-buttons').style.display = 'flex';
+            document.getElementById('feedback-gracias').style.display = 'none';
+            document.querySelectorAll('.feedback-btn').forEach(btn => btn.disabled = false);
             
             const container = document.getElementById('sociosContainer');
             container.innerHTML = '';
