@@ -480,6 +480,17 @@
                         </div>
                     </div>
 
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="plazoDuracion">Plazo de duración del contrato</label>
+                            <input type="text" id="plazoDuracion" name="plazoDuracion" placeholder="Ej: 99 años">
+                        </div>
+                        <div class="form-group">
+                            <label for="cierreEjercicio">Probable fecha de cierre de ejercicio</label>
+                            <input type="text" id="cierreEjercicio" name="cierreEjercicio" placeholder="Ej: 31 de Diciembre">
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="gerente">Gerente <span style="color: #999; font-weight: normal;">(4)</span></label>
                         <input type="text" id="gerente" name="gerente" placeholder="Nombre del gerente (puede ser socio)">
@@ -616,6 +627,104 @@
     <script>
         let socioCount = 1;
 
+        function saveFormData() {
+            const formData = {};
+            const generalInputIds = [
+                'denominacion1', 'denominacion2', 'denominacion3',
+                'domicilio', 'capital', 'tipoSocietario',
+                'plazoDuracion', 'cierreEjercicio',
+                'gerente', 'gerenteCuit', 'gerenteFecNac', 'gerenteDomicilio', 'gerenteEstado', 'gerenteProfesion',
+                'objetoSocial'
+            ];
+            generalInputIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    formData[id] = el.value;
+                }
+            });
+            
+            const gerenteSocioEl = document.querySelector('input[name="gerenteSocio"]:checked');
+            if (gerenteSocioEl) {
+                formData['gerenteSocio'] = gerenteSocioEl.value;
+            }
+            
+            const socioCards = document.querySelectorAll('#sociosContainer .socio-card');
+            const sociosData = [];
+            socioCards.forEach(card => {
+                const idMatch = card.id.match(/socio(\d+)-card/);
+                if (idMatch) {
+                    const num = parseInt(idMatch[1], 10);
+                    sociosData.push({
+                        id: num,
+                        nombre: document.getElementById(`socio${num}_nombre`)?.value || '',
+                        participacion: document.getElementById(`socio${num}_participacion`)?.value || '',
+                        dni: document.getElementById(`socio${num}_dni`)?.value || '',
+                        cuit: document.getElementById(`socio${num}_cuit`)?.value || '',
+                        nacimiento: document.getElementById(`socio${num}_nacimiento`)?.value || '',
+                        domicilio: document.getElementById(`socio${num}_domicilio`)?.value || '',
+                        estado: document.getElementById(`socio${num}_estado`)?.value || '',
+                        profesion: document.getElementById(`socio${num}_profesion`)?.value || '',
+                    });
+                }
+            });
+            formData['socios'] = sociosData;
+            formData['maxSocioId'] = socioCount;
+            
+            localStorage.setItem('sociedadFormState', JSON.stringify(formData));
+        }
+
+        function loadFormData() {
+            const raw = localStorage.getItem('sociedadFormState');
+            if (!raw) return;
+            try {
+                const formData = JSON.parse(raw);
+                
+                const generalInputIds = [
+                    'denominacion1', 'denominacion2', 'denominacion3',
+                    'domicilio', 'capital', 'tipoSocietario',
+                    'plazoDuracion', 'cierreEjercicio',
+                    'gerente', 'gerenteCuit', 'gerenteFecNac', 'gerenteDomicilio', 'gerenteEstado', 'gerenteProfesion',
+                    'objetoSocial'
+                ];
+                generalInputIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && formData[id] !== undefined) {
+                        el.value = formData[id];
+                    }
+                });
+                
+                if (formData['gerenteSocio']) {
+                    const radio = document.querySelector(`input[name="gerenteSocio"][value="${formData['gerenteSocio']}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                    }
+                }
+                toggleGerenteInfo();
+                
+                if (formData['socios'] && Array.isArray(formData['socios'])) {
+                    const container = document.getElementById('sociosContainer');
+                    container.innerHTML = '';
+                    
+                    formData['socios'].forEach(s => {
+                        container.insertAdjacentHTML('beforeend', crearSocioHTML(s.id));
+                        
+                        if (document.getElementById(`socio${s.id}_nombre`)) document.getElementById(`socio${s.id}_nombre`).value = s.nombre || '';
+                        if (document.getElementById(`socio${s.id}_participacion`)) document.getElementById(`socio${s.id}_participacion`).value = s.participacion || '';
+                        if (document.getElementById(`socio${s.id}_dni`)) document.getElementById(`socio${s.id}_dni`).value = s.dni || '';
+                        if (document.getElementById(`socio${s.id}_cuit`)) document.getElementById(`socio${s.id}_cuit`).value = s.cuit || '';
+                        if (document.getElementById(`socio${s.id}_nacimiento`)) document.getElementById(`socio${s.id}_nacimiento`).value = s.nacimiento || '';
+                        if (document.getElementById(`socio${s.id}_domicilio`)) document.getElementById(`socio${s.id}_domicilio`).value = s.domicilio || '';
+                        if (document.getElementById(`socio${s.id}_estado`)) document.getElementById(`socio${s.id}_estado`).value = s.estado || '';
+                        if (document.getElementById(`socio${s.id}_profesion`)) document.getElementById(`socio${s.id}_profesion`).value = s.profesion || '';
+                    });
+                    
+                    socioCount = formData['maxSocioId'] || formData['socioCount'] || formData['socios'].length;
+                }
+            } catch (e) {
+                console.error('Error loading form state from localStorage:', e);
+            }
+        }
+
         function toggleGerenteInfo() {
             const gerenteSocio = document.querySelector('input[name="gerenteSocio"]:checked').value;
             const gerenteInfoSection = document.getElementById('gerenteInfoSection');
@@ -691,12 +800,14 @@
             socioCount++;
             const container = document.getElementById('sociosContainer');
             container.insertAdjacentHTML('beforeend', crearSocioHTML(socioCount));
+            saveFormData();
         }
 
         function eliminarSocio(numero) {
             const card = document.getElementById(`socio${numero}-card`);
             if (card) {
                 card.remove();
+                saveFormData();
             }
         }
 
@@ -708,7 +819,17 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', inicializarSocios);
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('sociedadFormState')) {
+                loadFormData();
+            } else {
+                inicializarSocios();
+            }
+            
+            const form = document.getElementById('formulario');
+            form.addEventListener('input', saveFormData);
+            form.addEventListener('change', saveFormData);
+        });
 
         function generarPDF() {
           try {
@@ -744,6 +865,8 @@
                 ['Domicilio:', document.getElementById('domicilio').value],
                 ['Capital:', document.getElementById('capital').value],
                 ['Tipo Societario:', document.getElementById('tipoSocietario').value],
+                ['Plazo de Duración:', document.getElementById('plazoDuracion').value],
+                ['Probable Cierre Ejercicio:', document.getElementById('cierreEjercicio').value],
                 ['Gerente:', document.getElementById('gerente').value],
             ];
 
@@ -1039,6 +1162,8 @@
             container.innerHTML = '';
             socioCount = 1;
             inicializarSocios();
+            
+            localStorage.removeItem('sociedadFormState');
             
             window.scrollTo(0, 0);
         }
