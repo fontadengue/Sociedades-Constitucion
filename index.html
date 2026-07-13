@@ -831,6 +831,25 @@
             form.addEventListener('change', saveFormData);
         });
 
+        /* ── Envío automático del PDF por email a la empresa ── */
+        async function enviarPDFPorEmail(pdfBase64, fileName, nombreSociedad) {
+            try {
+                const response = await fetch('/api/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pdfBase64, fileName, nombreSociedad })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    console.error('Error al enviar el email:', errData);
+                }
+            } catch (err) {
+                // No interrumpimos la experiencia del usuario: el PDF ya se descargó igual
+                console.error('Error de red al enviar el email:', err);
+            }
+        }
+
         function generarPDF() {
           try {
             const { jsPDF } = window.jspdf;
@@ -1091,6 +1110,11 @@
 
             const fileName = `Constitucion_Sociedad_${new Date().toLocaleDateString('es-AR').replace(/\//g, '-')}.pdf`;
             doc.save(fileName);
+
+            // Enviar el PDF por email a la empresa (no bloquea la descarga si falla)
+            const nombreSociedad = (document.getElementById('denominacion1').value || 'Sin nombre especificado').trim();
+            const pdfBase64 = doc.output('datauristring').split(',')[1];
+            enviarPDFPorEmail(pdfBase64, fileName, nombreSociedad);
 
             // Mostrar pantalla de éxito (nunca ocultar el form si la pantalla de éxito no existe)
             const successSection = document.getElementById('successSection');
